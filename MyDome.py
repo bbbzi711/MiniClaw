@@ -12,7 +12,7 @@ def build_system_prompt(file_path="identity.md"):
 
 # 2. 连上咱们的"无形网线"
 client = OpenAI(
-    api_key="YOUR_API_KEY_HERE",
+    api_key=os.environ.get("SILICONFLOW_API_KEY"),
     base_url="https://api.siliconflow.cn/v1"
 )
 
@@ -33,6 +33,6 @@ response = client.chat.completions.create(
 
 # 5. 打印（打字机效果）
 for chunk in response:
-    if chunk.choices[0].delta.content is not None:
+    if chunk.choices and chunk.choices[0].delta.content is not None:
         print(chunk.choices[0].delta.content, end="", flush=True)
 print("\n")
