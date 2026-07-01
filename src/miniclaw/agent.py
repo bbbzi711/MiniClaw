@@ -17,7 +17,8 @@ client = OpenAI(
 )
 
 # 3. 核心实操：给大模型"洗脑"
-system_role_content = build_system_prompt("identity.md")
+_IDENTITY_PATH = os.path.join(os.path.dirname(__file__), "identity.md")
+system_role_content = build_system_prompt(_IDENTITY_PATH)
 print(f"读取到的人设设定：\n【{system_role_content}】\n" + "=" * 30)
 
 # 4. 发起文本接龙

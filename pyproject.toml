@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "miniclaw"
 version = "0.1.0"
@@ -7,3 +11,6 @@ requires-python = ">=3.11"
 dependencies = [
     "openai>=2.44.0",
 ]
+
+[project.scripts]
+miniclaw = "miniclaw.__main__:main"
