@@ -1,0 +1,8 @@
+{
+    "api_key": "sk-你的API-Key填这里",
+    "base_url": "https://api.siliconflow.cn/v1",
+    "model": "Pro/moonshotai/Kimi-K2.5",
+    "workspace": ".",
+    "max_iterations": 32,
+    "identity_file": "identity.md"
+}

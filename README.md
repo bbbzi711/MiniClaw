@@ -20,7 +20,9 @@ git clone <repo-url> && cd MiniClaw
 # 2. 同步依赖（自动创建虚拟环境 + 可编辑安装）
 uv sync
 
-# 3. 创建 config.json，填入 API Key（参考下方配置说明）
+# 3. 创建配置
+cp config.example.json config.json
+# 编辑 config.json，填入你的 API Key
 
 # 4. 启动
 uv run miniclaw
@@ -70,6 +72,7 @@ MiniClaw/
 ├── memory/                    # 长期记忆（可选）
 │   └── MEMORY.md
 ├── identity.md                # Agent 人设
+├── config.example.json        # 配置模板（可提交）
 ├── config.json                # 用户配置（不提交到 git）
 ├── pyproject.toml             # 项目元数据 + 依赖
 ├── uv.lock                    # 依赖锁文件
