@@ -27,7 +27,7 @@ def build_agent() -> AgentLoop:
 
     # 2. 检查 API Key
     if not config.api_key:
-        print("错误：未设置 API Key。请在 config.json 中填写 api_key 或设置环境变量 NANOCLAW_API_KEY。")
+        print("错误：未设置 API Key。请在 config.json 中填写 api_key 或设置环境变量 MINICLAW_API_KEY。")
         sys.exit(1)
 
     # 3. 创建 Provider

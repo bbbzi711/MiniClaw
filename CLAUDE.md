@@ -32,7 +32,7 @@ load_config() → OpenAICompatProvider + ToolRegistry + ContextBuilder → Agent
 
 1. dataclass 默认值（兜底）
 2. JSON 文件覆盖
-3. `NANOCLAW_API_KEY` 环境变量（最高优先级）
+3. `MINICLAW_API_KEY` 环境变量（最高优先级）
 
 ### Provider 层（providers/）
 

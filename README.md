@@ -23,7 +23,7 @@ uv sync
 # 3. 配置 API Key
 cp .env.example .env
 # 编辑 .env，填入你的 API Key
-# 然后设置环境变量：$env:NANOCLAW_API_KEY="你的key"  (PowerShell)
+# 然后设置环境变量：$env:MINICLAW_API_KEY="你的key"  (PowerShell)
 # 或创建 config.json（参考下方配置说明）
 
 # 4. 启动
@@ -35,7 +35,7 @@ uv run miniclaw
 ### 方式一：环境变量（推荐）
 
 ```bash
-export NANOCLAW_API_KEY="sk-xxxxx"
+export MINICLAW_API_KEY="sk-xxxxx"
 ```
 
 ### 方式二：config.json
@@ -53,7 +53,7 @@ export NANOCLAW_API_KEY="sk-xxxxx"
 
 | 字段 | 说明 | 默认值 |
 |------|------|--------|
-| `api_key` | API 密钥，环境变量 `NANOCLAW_API_KEY` 优先级最高 | — |
+| `api_key` | API 密钥，环境变量 `MINICLAW_API_KEY` 优先级最高 | — |
 | `base_url` | API 地址 | `https://api.siliconflow.cn/v1` |
 | `model` | 模型名称 | `Pro/moonshotai/Kimi-K2.5` |
 | `workspace` | 文件工具的工作目录 | `.` |

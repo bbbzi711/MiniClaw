@@ -22,7 +22,7 @@ class MiniClawConfig:
 
 
 def load_config(config_path: str = "config.json") -> MiniClawConfig:
-    """从 JSON 文件加载配置，环境变量 NANOCLAW_API_KEY 优先级最高。
+    """从 JSON 文件加载配置，环境变量 MINICLAW_API_KEY 优先级最高。
 
     参数:
         config_path: JSON 配置文件路径，默认为工作目录下的 config.json。
@@ -43,8 +43,8 @@ def load_config(config_path: str = "config.json") -> MiniClawConfig:
             if hasattr(config, key):
                 setattr(config, key, value)
 
-    # 3. 环境变量 NANOCLAW_API_KEY 优先级最高
-    env_api_key = os.getenv("NANOCLAW_API_KEY", "")
+    # 3. 环境变量 MINICLAW_API_KEY 优先级最高
+    env_api_key = os.getenv("MINICLAW_API_KEY", "")
     if env_api_key:
         config.api_key = env_api_key
 
