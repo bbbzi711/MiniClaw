@@ -1,12 +1,33 @@
-# Python-generated files
+# Python
 __pycache__/
 *.py[oc]
+*.pyo
 build/
 dist/
 wheels/
 *.egg-info
+*.log
 
 # Virtual environments
 .venv
 .env
+venv/
+
+# 敏感配置
 config.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code 内部文件（不需要提交）
+.claude/
+output/
+
