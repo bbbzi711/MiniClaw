@@ -13,4 +13,4 @@ dependencies = [
 ]
 
 [project.scripts]
-miniclaw = "miniclaw.__main__:main"
+miniclaw = "miniclaw.main:main"

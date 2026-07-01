@@ -1,0 +1,11 @@
+{
+    "model": "Qwen/Qwen3.5-4B",
+    "max_turns": 50,
+    "stream": true,
+    "providers": {
+        "siliconflow": {
+            "api_key_env": "SILICONFLOW_API_KEY",
+            "base_url": "https://api.siliconflow.cn/v1"
+        }
+    }
+}
