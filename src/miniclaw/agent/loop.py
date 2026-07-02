@@ -1,10 +1,14 @@
 """Agent 主循环 —— 驱动 LLM ↔ Tool 的交互，含防死循环熔断机制。"""
 
 import json
+from typing import TYPE_CHECKING
 
 from ..providers.base import LLMProvider
 from .tools.registry import ToolRegistry
 from .context import ContextBuilder
+
+if TYPE_CHECKING:
+    from ..session.manager import SessionManager
 
 
 class AgentLoop:
@@ -23,17 +27,32 @@ class AgentLoop:
         context: ContextBuilder,
         model: str | None = None,
         max_iterations: int = 32,
+        session_manager: "SessionManager | None" = None,
+        session_key: str = "cli:direct",
     ) -> None:
         self.provider = provider
         self.tools = tools
         self.context = context
         self.model = model
         self.max_iterations = max_iterations
+        self.session_manager = session_manager
+        self.session_key = session_key
 
         # 内部状态
         self._tool_call_history: list[str] = []   # 滑动窗口（工具调用签名）
         self._session_history: list[dict] = []     # 跨轮对话历史
         self._round_start_idx: int = 0             # 本轮初始 messages 长度
+
+        # 从持久化存储恢复历史
+        if self.session_manager is not None:
+            self._session_history = self.session_manager.get_history(self.session_key)
+
+    # ---- 持久化辅助 ----
+
+    def _persist(self, message: dict) -> None:
+        """将单条消息写入 SessionManager（如果已配置）。"""
+        if self.session_manager is not None:
+            self.session_manager.save_message(self.session_key, message)
 
     # ---- 核心方法 ----
 
@@ -45,6 +64,9 @@ class AgentLoop:
             current_message=user_message,
         )
         self._round_start_idx = len(messages)
+
+        # 持久化用户消息
+        self._persist({"role": "user", "content": user_message})
 
         # 2. 工具定义（只取一次，循环中不变）
         tools_defs = self.tools.get_definitions()
@@ -62,6 +84,7 @@ class AgentLoop:
                 # 构造 assistant 消息（含 tool_calls）
                 assistant_msg = self._build_assistant_message(response)
                 messages.append(assistant_msg)
+                self._persist(assistant_msg)
 
                 # 逐个执行工具
                 for tc in response.tool_calls:
@@ -73,24 +96,30 @@ class AgentLoop:
                         if verdict.startswith("熔断"):
                             return verdict  # 直接终止
                         # 警告 → 跳过执行，注入 SYSTEM_ERROR
-                        messages.append({
+                        tool_msg = {
                             "role": "tool",
                             "tool_call_id": tc.id,
                             "content": verdict,
-                        })
+                        }
+                        messages.append(tool_msg)
+                        self._persist(tool_msg)
                         continue
 
                     # 正常执行
                     result = await self.tools.execute(tc.name, tc.arguments)
-                    messages.append({
+                    tool_msg = {
                         "role": "tool",
                         "tool_call_id": tc.id,
                         "content": result,
-                    })
+                    }
+                    messages.append(tool_msg)
+                    self._persist(tool_msg)
 
                 continue  # 回到循环顶部，让模型处理工具结果
 
             # c. 模型直接回复（无 tool_calls）
+            assistant_msg = {"role": "assistant", "content": response.content or ""}
+            self._persist(assistant_msg)
             self._save_to_history(messages)
             return response.content or ""
 
@@ -167,6 +196,8 @@ class AgentLoop:
         self._session_history.extend(new_msgs)
 
     def clear_history(self) -> None:
-        """清空所有内部状态（工具调用记录 + 会话历史）。"""
+        """清空所有内部状态（工具调用记录 + 会话历史 + 持久化文件）。"""
         self._tool_call_history.clear()
         self._session_history.clear()
+        if self.session_manager is not None:
+            self.session_manager.clear(self.session_key)

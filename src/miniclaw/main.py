@@ -15,6 +15,7 @@ from .agent.tools.web_fetch import WebFetchTool
 from .agent.context import ContextBuilder
 from .agent.loop import AgentLoop
 from .agent.skills import SkillsLoader
+from .session.manager import SessionManager
 
 
 BANNER = r"""
@@ -59,23 +60,30 @@ def build_agent() -> AgentLoop:
         skills_list = skills_loader.list_skills()
         print(f"已发现 {len(skills_list)} 个技能")
 
-    # 6. 创建 ContextBuilder
+    # 6. 创建会话管理器
+    session_manager = SessionManager(
+        os.path.join(config.workspace, "workspace", "sessions")
+    )
+
+    # 7. 创建 ContextBuilder
     context = ContextBuilder(
         config.workspace,
         config.identity_file,
         skills_summary=skills_summary,
     )
 
-    # 7. 组装 AgentLoop
+    # 8. 组装 AgentLoop
     agent = AgentLoop(
         provider=provider,
         tools=tools,
         context=context,
         model=config.model,
         max_iterations=config.max_iterations,
+        session_manager=session_manager,
+        session_key="cli:direct",
     )
 
-    # 8. 打印已注册的工具列表
+    # 9. 打印已注册的工具列表
     print(f"已注册工具：{tools.list_tools()}")
 
     return agent
