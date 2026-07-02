@@ -1,14 +1,20 @@
 """MiniClaw 入口 —— 组装 Agent 并启动交互式对话循环。"""
 
 import asyncio
+import os
 import sys
+
+from miniclaw.agent.tools.shell import ExecTool
 
 from .config import load_config
 from .providers.openai_compat import OpenAICompatProvider
 from .agent.tools.registry import ToolRegistry
 from .agent.tools.filesystem import ReadFileTool, WriteFileTool, ListDirTool
+from .agent.tools.web_search import WebSearchTool
+from .agent.tools.web_fetch import WebFetchTool
 from .agent.context import ContextBuilder
 from .agent.loop import AgentLoop
+from .agent.skills import SkillsLoader
 
 
 BANNER = r"""
@@ -42,11 +48,25 @@ def build_agent() -> AgentLoop:
     tools.register(ReadFileTool(config.workspace))
     tools.register(WriteFileTool(config.workspace))
     tools.register(ListDirTool(config.workspace))
+    tools.register(ExecTool(config.workspace))
+    tools.register(WebSearchTool())
+    tools.register(WebFetchTool())
 
-    # 5. 创建 ContextBuilder
-    context = ContextBuilder(config.workspace, config.identity_file)
+    # 5. 加载技能
+    skills_loader = SkillsLoader(os.path.join(config.workspace, "skills"))
+    skills_summary = skills_loader.build_skills_summary()
+    if skills_summary:
+        skills_list = skills_loader.list_skills()
+        print(f"已发现 {len(skills_list)} 个技能")
 
-    # 6. 组装 AgentLoop
+    # 6. 创建 ContextBuilder
+    context = ContextBuilder(
+        config.workspace,
+        config.identity_file,
+        skills_summary=skills_summary,
+    )
+
+    # 7. 组装 AgentLoop
     agent = AgentLoop(
         provider=provider,
         tools=tools,
@@ -55,7 +75,7 @@ def build_agent() -> AgentLoop:
         max_iterations=config.max_iterations,
     )
 
-    # 7. 打印已注册的工具列表
+    # 8. 打印已注册的工具列表
     print(f"已注册工具：{tools.list_tools()}")
 
     return agent

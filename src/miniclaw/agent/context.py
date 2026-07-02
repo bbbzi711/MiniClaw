@@ -13,9 +13,15 @@ class ContextBuilder:
         messages = ctx.build_messages(history=prev_msgs, current_message="帮我重构这段代码")
     """
 
-    def __init__(self, workspace: str, identity_file: str = "identity.md") -> None:
+    def __init__(
+        self,
+        workspace: str,
+        identity_file: str = "identity.md",
+        skills_summary: str = "",
+    ) -> None:
         self.workspace = workspace
         self.identity_file = identity_file
+        self.skills_summary = skills_summary
 
     # ---- 私有加载方法 ----
 
@@ -53,6 +59,9 @@ class ContextBuilder:
 
         if memory:
             parts.append(f"\n\n## 长期记忆\n{memory}")
+
+        if self.skills_summary:
+            parts.append(f"\n\n## 可用技能\n{self.skills_summary}")
 
         return "".join(parts)
 
